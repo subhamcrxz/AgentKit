@@ -1,25 +1,34 @@
-# Decision Drift Auditor
+## Implementation
 
-An AI agent that detects when organizational decisions change, conflict, or become inconsistent across meetings, documents, messages, and other sources.
+The Decision Drift Auditor is implemented as a Lamatic.ai workflow.
 
-## Problem
+### Workflow
 
-Teams make decisions across meetings, documents, messages, and code changes. Later statements can silently contradict earlier decisions, creating confusion and inconsistent execution.
+The workflow consists of three stages:
 
-## Solution
+1. **API Request**
+   - Receives a `decisionHistory` input containing organizational decisions and supporting evidence.
 
-Decision Drift Auditor extracts decisions, builds a timeline of changes, detects contradictions, and highlights decisions that require human confirmation.
+2. **Generate Text**
+   - Uses an LLM to analyze the decision history.
+   - Identifies the original decision, later statements, supporting evidence, potential drift type, confidence, and whether human confirmation is required.
+   - The model is instructed not to invent evidence when the history is insufficient.
 
-## Example
+3. **API Response**
+   - Returns a structured audit containing:
+     - `decision`
+     - `earlierEvidence`
+     - `laterEvidence`
+     - `driftType`
+     - `confidence`
+     - `humanConfirmationNeeded`
+     - `reason`
 
-Original decision:
-"We will use PostgreSQL as the source of truth for customer data."
+### Example
 
-Later statement:
-"The customer service application now uses MongoDB as its source of truth."
+Input:
 
-The agent flags this as potential decision drift and provides the evidence supporting the conflict.
-
-## Status
-
-Work in progress.
+```json
+{
+  "decisionHistory": "January 10: Engineering decided PostgreSQL would be the source of truth for customer data. February 15: Architecture confirmed PostgreSQL as the primary customer database. March 3: Engineering and Architecture approved migrating customer-service data to MongoDB, making MongoDB the source of truth for customer-service data."
+}
